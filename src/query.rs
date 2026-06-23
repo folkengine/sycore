@@ -6,7 +6,7 @@ use std::collections::BTreeMap;
 use crate::apply::assignment_conflict;
 use crate::error::Conflict;
 use crate::ids::{ConcertId, MusicianId};
-use crate::state::Federation;
+use crate::state::{Federation, count_u16};
 
 /// Per-concert staffing coverage.
 #[derive(Clone, Debug, PartialEq, Eq)]
@@ -28,6 +28,7 @@ pub struct Coverage {
 /// use sycore::state::Federation;
 /// assert!(conflicts(&Federation::new()).is_empty());
 /// ```
+#[must_use]
 pub fn conflicts(state: &Federation) -> Vec<Conflict> {
     let mut out = Vec::new();
 
@@ -75,6 +76,7 @@ pub fn conflicts(state: &Federation) -> Vec<Conflict> {
 /// let cov = coverage(&Federation::new(), &ConcertId::new("C99"));
 /// assert!(!cov.satisfied);
 /// ```
+#[must_use]
 pub fn coverage(state: &Federation, concert: &ConcertId) -> Coverage {
     let Some(c) = state.concerts.get(concert) else {
         return Coverage {
@@ -94,7 +96,7 @@ pub fn coverage(state: &Federation, concert: &ConcertId) -> Coverage {
             *by_instrument.entry(entry.instrument.clone()).or_insert(0) += 1;
         }
     }
-    let assigned = c.assignments.len() as u16;
+    let assigned = count_u16(c.assignments.len());
     Coverage {
         concert: concert.clone(),
         required: c.players_required,
@@ -115,6 +117,7 @@ pub fn coverage(state: &Federation, concert: &ConcertId) -> Coverage {
 /// use sycore::ids::ConcertId;
 /// assert!(legal_assignments(&Federation::new(), &ConcertId::new("C01"), "Violin I").is_empty());
 /// ```
+#[must_use]
 pub fn legal_assignments(
     state: &Federation,
     concert: &ConcertId,

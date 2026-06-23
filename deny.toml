@@ -3,6 +3,13 @@
 
 # Note: running just `cargo deny check` is equivalent to `cargo deny check advisories bans licenses sources`
 
+# Resolve the full feature set so local `cargo deny check` evaluates the same
+# dependency graph as CI, which runs `cargo deny check --all-features`. Without
+# this, the optional `seed` feature's derive chain (serde_derive -> syn ->
+# unicode-ident) is absent locally but present in CI, hiding license mismatches.
+[graph]
+all-features = true
+
 [advisories]
 # The path where the advisory database is cloned/fetched into
 db-path = "~/.cargo/advisory-db"
@@ -18,45 +25,38 @@ ignore = []
 # List of explicitly allowed licenses
 # See https://spdx.org/licenses/ for list of possible licenses
 #
-# This project is GPL-3.0-or-later, so we only allow licenses that are:
-# 1. GPL-compatible (can be combined with GPL code)
-# 2. More permissive than GPL (allow relicensing under GPL)
+# This project is dual-licensed "MIT OR Apache-2.0" (permissive). We allow the
+# permissive licenses commonly found in the Rust dependency tree; all are
+# compatible with redistribution under either of our two licenses.
 #
-# IMPORTANT: GPL-2.0-only is NOT compatible with GPL-3.0!
-#
-# NOTE: To avoid warnings, only actively used licenses are listed below.
-# Uncomment additional licenses as you add dependencies that need them.
+# NOTE: To avoid "license-not-encountered" warnings, only licenses actually
+# present in the all-features dependency tree are active below. Uncomment
+# additional licenses as you add dependencies that introduce them.
 
 allow = [
-    # Most common in Rust (covers ~90% of crates)
+    # Active: licenses present in the all-features dependency tree.
     "MIT",
     "Apache-2.0",
-    "Apache-2.0 WITH LLVM-exception",
-
-    # BSD family
-    "BSD-2-Clause",
-    "BSD-3-Clause",
-    "ISC",
-    "0BSD",
-
-    # Public domain / highly permissive
-    "CC0-1.0",
-    "Unlicense",
-    "Zlib",
-
-    # Other common
+    # Required by `unicode-ident` (pulled in via serde_derive -> proc-macro2/syn
+    # under the `seed` feature). Its SPDX is "(MIT OR Apache-2.0) AND Unicode-3.0",
+    # so the Unicode-3.0 AND-clause must be explicitly allowed.
     "Unicode-3.0",
-    "Unicode-DFS-2016",
 
-    # Uncomment to add GPL-family licenses if your project uses them:
-    # "GPL-3.0-only",
-    # "GPL-3.0-or-later",
-    # "LGPL-2.1",
-    # "LGPL-2.1-or-later",
-    # "LGPL-3.0-only",
-    # "LGPL-3.0-or-later",
+    # Permissive licenses to enable as dependencies introduce them:
+    # "Apache-2.0 WITH LLVM-exception",
+    # "BSD-2-Clause",
+    # "BSD-3-Clause",
+    # "ISC",
+    # "0BSD",
+    # "CC0-1.0",
+    # "Unlicense",
+    # "Zlib",
+    # "Unicode-DFS-2016",
+
+    # Uncomment to add GPL-family / weak-copyleft licenses if ever needed:
     # "MPL-2.0",
-    # "AGPL-3.0-only",
+    # "LGPL-2.1-or-later",
+    # "LGPL-3.0-or-later",
 ]
 
 # The confidence threshold for detecting a license from license text.

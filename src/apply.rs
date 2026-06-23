@@ -5,7 +5,7 @@ use crate::entity::{CalendarEvent, EventKind, Musician, Orchestra, RosterEntry, 
 use crate::error::{KernelError, Warning};
 use crate::event::Event;
 use crate::ids::{ConcertId, EventId, MusicianId, VenueId};
-use crate::state::Federation;
+use crate::state::{Federation, count_u16};
 use crate::time::TimeSlot;
 
 /// The result of a successful transition: the new state, the events it emitted,
@@ -40,6 +40,11 @@ pub struct Transition {
 /// let t = apply(&Federation::new(), cmd).unwrap();
 /// assert_eq!(t.events.len(), 1);
 /// ```
+// `apply` is intentionally one flat dispatcher over the command enum: each arm is a
+// self-contained, top-to-bottom handler, and keeping them in one match keeps the full
+// transition contract visible in a single place. The length is inherent to the command
+// surface, not accidental complexity, so the line count is allowed deliberately.
+#[allow(clippy::too_many_lines)]
 pub fn apply(state: &Federation, command: Command) -> Result<Transition, KernelError> {
     let mut next = state.clone();
     let mut events = Vec::new();
@@ -236,7 +241,10 @@ pub fn apply(state: &Federation, command: Command) -> Result<Transition, KernelE
                 }
             }
 
-            let concert_mut = next.concerts.get_mut(&concert).expect("checked above");
+            let concert_mut = next
+                .concerts
+                .get_mut(&concert)
+                .ok_or_else(|| KernelError::UnknownConcert(concert.clone()))?;
             let event_id = EventId::new(format!("{}-E{}", concert, concert_mut.schedule.len() + 1));
             let requires_organ = concert_mut.program.requires_organ;
             let requires_pit = concert_mut.program.requires_pit;
@@ -255,34 +263,36 @@ pub fn apply(state: &Federation, command: Command) -> Result<Transition, KernelE
 
             // Soft warnings.
             if kind == EventKind::Performance {
-                let has_rehearsal = next.concerts[&concert]
-                    .schedule
-                    .iter()
-                    .any(|e| e.kind == EventKind::Rehearsal);
+                let has_rehearsal = next
+                    .concerts
+                    .get(&concert)
+                    .is_some_and(|c| c.schedule.iter().any(|e| e.kind == EventKind::Rehearsal));
                 if !has_rehearsal {
                     warnings.push(Warning::NoRehearsal {
                         concert: concert.clone(),
                     });
                 }
-                let v = &next.venues[&venue];
-                if requires_organ && !v.has_organ {
-                    warnings.push(Warning::VenueCapabilityMismatch {
-                        venue: venue.clone(),
-                        capability: "organ".into(),
-                    });
-                }
-                if requires_pit && !v.has_pit {
-                    warnings.push(Warning::VenueCapabilityMismatch {
-                        venue: venue.clone(),
-                        capability: "pit".into(),
-                    });
+                if let Some(v) = next.venues.get(&venue) {
+                    if requires_organ && !v.has_organ {
+                        warnings.push(Warning::VenueCapabilityMismatch {
+                            venue: venue.clone(),
+                            capability: "organ".into(),
+                        });
+                    }
+                    if requires_pit && !v.has_pit {
+                        warnings.push(Warning::VenueCapabilityMismatch {
+                            venue: venue.clone(),
+                            capability: "pit".into(),
+                        });
+                    }
                 }
             }
         }
         Command::AssignPlayer { concert, musician } => {
-            if !next.musicians.contains_key(&musician) {
+            let Some(musician_rec) = next.musicians.get(&musician) else {
                 return Err(KernelError::UnknownMusician(musician));
-            }
+            };
+            let availability_pct = musician_rec.availability_pct;
             let c = next
                 .concerts
                 .get(&concert)
@@ -293,10 +303,12 @@ pub fn apply(state: &Federation, command: Command) -> Result<Transition, KernelE
             if let Some(err) = assignment_conflict(&next, &concert, &musician) {
                 return Err(err);
             }
-            let availability_pct = next.musicians[&musician].availability_pct;
-            let c_mut = next.concerts.get_mut(&concert).expect("checked above");
+            let c_mut = next
+                .concerts
+                .get_mut(&concert)
+                .ok_or_else(|| KernelError::UnknownConcert(concert.clone()))?;
             c_mut.assignments.push(musician.clone());
-            let (required, assigned) = (c_mut.players_required, c_mut.assignments.len() as u16);
+            let (required, assigned) = (c_mut.players_required, count_u16(c_mut.assignments.len()));
             events.push(Event::PlayerAssigned {
                 concert: concert.clone(),
                 musician: musician.clone(),
@@ -324,7 +336,7 @@ pub fn apply(state: &Federation, command: Command) -> Result<Transition, KernelE
                 return Err(KernelError::NotAssigned { musician, concert });
             };
             c.assignments.remove(pos);
-            let (required, assigned) = (c.players_required, c.assignments.len() as u16);
+            let (required, assigned) = (c.players_required, count_u16(c.assignments.len()));
             events.push(Event::PlayerUnassigned {
                 concert: concert.clone(),
                 musician,
@@ -408,9 +420,8 @@ pub(crate) fn assignment_conflict(
             orchestra: c.orchestra.clone(),
         });
     }
-    let musician_record = match state.musicians.get(musician) {
-        Some(m) => m,
-        None => return Some(KernelError::UnknownMusician(musician.clone())),
+    let Some(musician_record) = state.musicians.get(musician) else {
+        return Some(KernelError::UnknownMusician(musician.clone()));
     };
     let this_slots = concert_slots(&c.schedule);
     let other_slots = musician_busy(state, musician, Some(concert));
@@ -662,8 +673,8 @@ mod tests {
         );
     }
 
-    fn roster_one(f: Federation, id: &str) -> Federation {
-        let f = apply(&f, reg_musician(id)).unwrap().state;
+    fn roster_one(f: &Federation, id: &str) -> Federation {
+        let f = apply(f, reg_musician(id)).unwrap().state;
         apply(
             &f,
             Command::AddToRoster {
@@ -696,7 +707,7 @@ mod tests {
     #[test]
     fn assign_succeeds_and_warns_understaffed() {
         let mut f = base_with_concert(); // players_required = 2
-        f = roster_one(f, "M001");
+        f = roster_one(&f, "M001");
         let t = apply(
             &f,
             Command::AssignPlayer {
@@ -723,7 +734,7 @@ mod tests {
     #[test]
     fn assign_rejects_unavailable_slot() {
         let mut f = base_with_concert();
-        f = roster_one(f, "M001");
+        f = roster_one(&f, "M001");
         f = apply(
             &f,
             Command::ScheduleEvent {
@@ -765,7 +776,7 @@ mod tests {
         // Assign first, mark unavailable, THEN schedule into the blackout window.
         // The unavailability invariant must hold symmetrically with AssignPlayer.
         let mut f = base_with_concert();
-        f = roster_one(f, "M001");
+        f = roster_one(&f, "M001");
         f = apply(
             &f,
             Command::AssignPlayer {
@@ -805,7 +816,7 @@ mod tests {
     #[test]
     fn unassign_removes_player() {
         let mut f = base_with_concert();
-        f = roster_one(f, "M001");
+        f = roster_one(&f, "M001");
         f = apply(
             &f,
             Command::AssignPlayer {

@@ -13,3 +13,6 @@ Cargo.lock
 # Added by cargo
 
 /target
+
+# Superpowers SDD scratch (progress ledger, task briefs, reports)
+.superpowers/

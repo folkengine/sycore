@@ -3,7 +3,7 @@
 
 use crate::entity::{EventKind, RosterEntry};
 use crate::ids::{ConcertId, MusicianId, OrchestraId, VenueId};
-use crate::state::Federation;
+use crate::state::{Federation, count_u16};
 use crate::time::{Time, TimeSlot};
 
 /// One call on a musician's personal calendar.
@@ -96,6 +96,7 @@ pub struct VenueView {
 /// let v = view_for_musician(&Federation::new(), &MusicianId::new("M001"));
 /// assert!(v.calendar.is_empty());
 /// ```
+#[must_use]
 pub fn view_for_musician(state: &Federation, musician: &MusicianId) -> MusicianView {
     let mut calendar = Vec::new();
     for concert in state.concerts.values() {
@@ -160,6 +161,7 @@ pub fn view_for_musician(state: &Federation, musician: &MusicianId) -> MusicianV
 /// let v = view_for_orchestra(&Federation::new(), &OrchestraId::new("RSO"));
 /// assert!(v.concerts.is_empty());
 /// ```
+#[must_use]
 pub fn view_for_orchestra(state: &Federation, orchestra: &OrchestraId) -> OrchestraView {
     let roster = state
         .orchestras
@@ -181,11 +183,11 @@ pub fn view_for_orchestra(state: &Federation, orchestra: &OrchestraId) -> Orches
             players_required: c.players_required,
             assignments: c.assignments.clone(),
         });
-        if (c.assignments.len() as u16) < c.players_required {
+        if count_u16(c.assignments.len()) < c.players_required {
             coverage.push(CoverageGap {
                 concert: c.id.clone(),
                 required: c.players_required,
-                assigned: c.assignments.len() as u16,
+                assigned: count_u16(c.assignments.len()),
             });
         }
     }
@@ -238,6 +240,7 @@ pub fn view_for_orchestra(state: &Federation, orchestra: &OrchestraId) -> Orches
 /// let v = view_for_venue(&Federation::new(), &VenueId::new("VEN-01"));
 /// assert!(v.bookings.is_empty());
 /// ```
+#[must_use]
 pub fn view_for_venue(state: &Federation, venue: &VenueId) -> VenueView {
     let mut bookings = Vec::new();
     for c in state.concerts.values() {

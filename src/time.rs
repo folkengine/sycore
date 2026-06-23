@@ -17,6 +17,7 @@ impl Date {
     /// let d = Date { year: 2024, month: 9, day: 14 };
     /// assert_eq!(d.month, 9);
     /// ```
+    #[must_use]
     pub fn new(year: u16, month: u8, day: u8) -> Self {
         Self { year, month, day }
     }
@@ -42,7 +43,7 @@ impl Time {
         if hour > 23 || minute > 59 {
             return Err("hour must be 0..=23 and minute 0..=59");
         }
-        Ok(Self(hour as u16 * 60 + minute as u16))
+        Ok(Self(u16::from(hour) * 60 + u16::from(minute)))
     }
 
     /// Minutes since midnight.
@@ -52,6 +53,7 @@ impl Time {
     /// use sycore::time::Time;
     /// assert_eq!(Time(1170).minutes(), 1170);
     /// ```
+    #[must_use]
     pub fn minutes(self) -> u16 {
         self.0
     }
@@ -75,6 +77,7 @@ impl TimeSlot {
     /// let slot = TimeSlot::new(Date::new(2024, 9, 14), Time(1080), 180);
     /// assert_eq!(slot.duration_min, 180);
     /// ```
+    #[must_use]
     pub fn new(date: Date, start: Time, duration_min: u16) -> Self {
         Self {
             date,
@@ -91,8 +94,9 @@ impl TimeSlot {
     /// let slot = TimeSlot::new(Date::new(2024, 9, 14), Time(1080), 180);
     /// assert_eq!(slot.end_min(), 1260);
     /// ```
+    #[must_use]
     pub fn end_min(self) -> u32 {
-        self.start.0 as u32 + self.duration_min as u32
+        u32::from(self.start.0) + u32::from(self.duration_min)
     }
 
     /// Returns `true` if two slots fall on the same date and their intervals
@@ -109,10 +113,11 @@ impl TimeSlot {
     /// assert!(a.overlaps(&b));
     /// assert!(!a.overlaps(&c)); // touch, no overlap
     /// ```
+    #[must_use]
     pub fn overlaps(&self, other: &TimeSlot) -> bool {
         self.date == other.date
-            && (self.start.0 as u32) < other.end_min()
-            && (other.start.0 as u32) < self.end_min()
+            && u32::from(self.start.0) < other.end_min()
+            && u32::from(other.start.0) < self.end_min()
     }
 }
 
