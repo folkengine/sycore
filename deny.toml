@@ -19,7 +19,14 @@ db-urls = ["https://github.com/rustsec/advisory-db"]
 yanked = "deny"
 # A list of advisory IDs to ignore. Note that ignored advisories will still
 # output a note when they are encountered.
-ignore = []
+ignore = [
+    # `paste` is unmaintained (not a vulnerability). It is pulled in only
+    # transitively through the `dcbor` / `bc-tags` stack, which is itself a
+    # dev-only dependency of the `credential_envelope` example (the Gordian
+    # Envelope layer never enters the library's dependency graph). There is no
+    # alternative within that stack, so this is accepted at the dev boundary.
+    "RUSTSEC-2024-0436",
+]
 
 [licenses]
 # List of explicitly allowed licenses
