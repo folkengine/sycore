@@ -186,6 +186,9 @@ fn tier_of(s: &str) -> Tier {
 ///
 /// # Errors
 /// Returns [`SeedError`] if the JSON is malformed or a date/time field is invalid.
+// A flat, top-to-bottom translation of the sample JSON into the command stream; the
+// length tracks the sample schema's surface, not branching complexity.
+#[allow(clippy::too_many_lines)]
 pub fn sample_commands(json: &str) -> Result<Vec<Command>, SeedError> {
     let root: Root = serde_json::from_str(json)?;
     let mut cmds = Vec::new();
@@ -208,6 +211,8 @@ pub fn sample_commands(json: &str) -> Result<Vec<Command>, SeedError> {
     }
 
     for r in root.roster_pool {
+        // Clamped to [0, 100] before the cast, so the narrowing conversion is exact.
+        #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
         let availability_pct = (r.availability * 100.0).round().clamp(0.0, 100.0) as u8;
         cmds.push(Command::RegisterMusician {
             id: MusicianId::new(r.id.clone()),
@@ -258,6 +263,9 @@ pub fn sample_commands(json: &str) -> Result<Vec<Command>, SeedError> {
             } else {
                 &reh.start_time
             })?;
+            // Sample durations are small positives; Rust's float-to-int cast saturates,
+            // so this narrowing is safe.
+            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
             let duration_min = (reh.duration_hours * 60.0).round() as u16;
             cmds.push(Command::ScheduleEvent {
                 concert: ConcertId::new(c.concert_id.clone()),
@@ -281,10 +289,13 @@ pub fn sample_commands(json: &str) -> Result<Vec<Command>, SeedError> {
                 Some(parse_time(&perf.downbeat)?)
             };
             // Occupied window: from call (or start) for 3h by default.
-            let start = call.unwrap_or(match perf.start_time.is_empty() {
-                true => Time(1170),
-                false => parse_time(&perf.start_time)?,
-            });
+            let start = if let Some(t) = call {
+                t
+            } else if perf.start_time.is_empty() {
+                Time(1170)
+            } else {
+                parse_time(&perf.start_time)?
+            };
             cmds.push(Command::ScheduleEvent {
                 concert: ConcertId::new(c.concert_id.clone()),
                 kind: EventKind::Performance,

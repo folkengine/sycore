@@ -1,0 +1,4 @@
+# Project proper nouns that read as identifiers in doc comments but should not
+# be flagged by `clippy::doc_markdown` as "missing backticks". The ".." entry
+# preserves Clippy's built-in default list (GitHub, OAuth, etc.).
+doc-valid-idents = ["SyCore", "FolkEngine", ".."]
