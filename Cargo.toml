@@ -12,3 +12,16 @@ seed = ["dep:serde", "dep:serde_json"]
 [dependencies]
 serde = { version = "1", features = ["derive"], optional = true }
 serde_json = { version = "1", optional = true }
+
+# Dev-only: the credential_envelope example stands in for the substrate (the
+# layer above the pure kernel) and links the Gordian Envelope stack. These MUST
+# stay in [dev-dependencies] so they never enter the library's dependency graph
+# and the public API stays pure (SPEC-sycore-envelope-boundary obligations 6–8).
+[dev-dependencies]
+# Minimal feature set: `ed25519` (issuer signing → signature → known_value) and
+# `salt` (§4.6). Default features are off on purpose — they pull `ssh`/`rsa`
+# (RUSTSEC-2023-0071) and `pqcrypto`, which the example does not use and which
+# would otherwise fail the CI `cargo-deny` advisories check.
+bc-envelope = { version = "0.43", default-features = false, features = ["ed25519", "salt"] }
+bc-components = { version = "0.31", default-features = false, features = ["ed25519"] }
+blake3 = "1"
