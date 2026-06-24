@@ -1,0 +1,16 @@
+# Standalone kata project. The empty [workspace] table makes this its own
+# workspace root so it never attaches to a parent manifest.
+[workspace]
+
+[package]
+name = "credential_envelope_kata"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[dependencies]
+# Minimal feature set — `ed25519` (signing) + `salt` (§4.6). Defaults are off
+# on purpose; they pull `ssh`/`rsa` and `pqcrypto`, which this kata never uses.
+bc-envelope = { version = "0.43", default-features = false, features = ["ed25519", "salt"] }
+bc-components = { version = "0.31", default-features = false, features = ["ed25519"] }
+blake3 = "1"

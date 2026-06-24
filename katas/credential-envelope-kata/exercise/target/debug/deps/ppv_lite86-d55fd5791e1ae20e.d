@@ -1,0 +1,10 @@
+/Users/christoph/src/github.com/folkengine/sycore/katas/credential-envelope-kata/exercise/target/debug/deps/ppv_lite86-d55fd5791e1ae20e.d: /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/lib.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/soft.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/types.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/generic.rs
+
+/Users/christoph/src/github.com/folkengine/sycore/katas/credential-envelope-kata/exercise/target/debug/deps/libppv_lite86-d55fd5791e1ae20e.rlib: /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/lib.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/soft.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/types.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/generic.rs
+
+/Users/christoph/src/github.com/folkengine/sycore/katas/credential-envelope-kata/exercise/target/debug/deps/libppv_lite86-d55fd5791e1ae20e.rmeta: /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/lib.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/soft.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/types.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/generic.rs
+
+/Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/lib.rs:
+/Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/soft.rs:
+/Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/types.rs:
+/Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/ppv-lite86-0.2.21/src/generic.rs:

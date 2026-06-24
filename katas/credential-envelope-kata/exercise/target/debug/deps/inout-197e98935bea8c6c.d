@@ -1,0 +1,11 @@
+/Users/christoph/src/github.com/folkengine/sycore/katas/credential-envelope-kata/exercise/target/debug/deps/inout-197e98935bea8c6c.d: /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/lib.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/errors.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/inout.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/inout_buf.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/reserved.rs
+
+/Users/christoph/src/github.com/folkengine/sycore/katas/credential-envelope-kata/exercise/target/debug/deps/libinout-197e98935bea8c6c.rlib: /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/lib.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/errors.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/inout.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/inout_buf.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/reserved.rs
+
+/Users/christoph/src/github.com/folkengine/sycore/katas/credential-envelope-kata/exercise/target/debug/deps/libinout-197e98935bea8c6c.rmeta: /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/lib.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/errors.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/inout.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/inout_buf.rs /Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/reserved.rs
+
+/Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/lib.rs:
+/Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/errors.rs:
+/Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/inout.rs:
+/Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/inout_buf.rs:
+/Users/christoph/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/inout-0.1.4/src/reserved.rs:
